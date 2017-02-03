@@ -1,11 +1,12 @@
 package com.fengniao.weather;
 
 
+import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +21,7 @@ import android.widget.Toast;
 import com.fengniao.weather.db.City;
 import com.fengniao.weather.db.County;
 import com.fengniao.weather.db.Province;
+import com.fengniao.weather.db.SavedWeather;
 import com.fengniao.weather.util.HttpUtil;
 import com.fengniao.weather.util.Utility;
 
@@ -110,20 +112,27 @@ public class ChooseAreaFragment extends Fragment {
                     queryCounties();
                 } else if (currentLevel == LEVEL_COUNTY) {
                     String weatherId = countyList.get(position).getWeatherId();
+                    SavedWeather savedWeather = new SavedWeather();
+                    savedWeather.setWeatherId(weatherId);
+                    List<SavedWeather> list = DataSupport.where("weatherId=?", weatherId).find(SavedWeather.class);
+                    if (list == null || list.isEmpty()) {
+                        savedWeather.save();
+                    } else {
+                        savedWeather.updateAll("weatherId = ?", weatherId);
+                    }
                     if (getActivity() instanceof MainActivity) {
                         Intent intent = new Intent(getActivity(), WeatherActivity.class);
-                        intent.putExtra("weather_id", weatherId);
                         startActivity(intent);
                         getActivity().finish();
-                    } else if (getActivity() instanceof WeatherActivity) {
-                        WeatherActivity activity = (WeatherActivity) getActivity();
-                        activity.drawerLayout.closeDrawers();
-                        activity.swipeRefresh.setRefreshing(true);
-                        activity.requestWeather(weatherId);
+                    }
+                    if (getActivity() instanceof AddCountyActivity) {
+                        getActivity().setResult(Activity.RESULT_OK);
+                        getActivity().finish();
                     }
                 }
             }
         });
+
 
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -137,7 +146,6 @@ public class ChooseAreaFragment extends Fragment {
         });
         queryProvinces();
     }
-
 
     /**
      * 查询全国所有的省，优先从数据库查询，如果没有查询到再去服务器查询
@@ -181,7 +189,6 @@ public class ChooseAreaFragment extends Fragment {
             String address = "http://guolin.tech/api/china/" + provinceCode + "/" + cityCode;
             queryFromServer(address, "county");
         }
-
     }
 
     /**

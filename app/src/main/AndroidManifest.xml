@@ -18,7 +18,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".WeatherActivity"></activity>
+        <activity android:name=".WeatherActivity" />
+        <activity android:name=".AddCountyActivity" />
+        <activity android:name=".EditCountyActivity"></activity>
     </application>
 
 </manifest>

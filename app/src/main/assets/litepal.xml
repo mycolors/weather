@@ -1,9 +1,10 @@
 <litepal>
-    <dbname value = "weather"/>
-    <version value = "1"/>
+    <dbname value="weather" />
+    <version value="1" />
     <list>
-        <mapping class = "com.fengniao.weather.db.Province"/>
-        <mapping class = "com.fengniao.weather.db.City"/>
-        <mapping class = "com.fengniao.weather.db.County"/>
+        <mapping class="com.fengniao.weather.db.Province" />
+        <mapping class="com.fengniao.weather.db.City" />
+        <mapping class="com.fengniao.weather.db.County" />
+        <mapping class="com.fengniao.weather.db.SavedWeather" />
     </list>
 </litepal>
