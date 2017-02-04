@@ -10,6 +10,7 @@ import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -57,7 +58,7 @@ public class WeatherActivity extends AppCompatActivity {
         weatherViewPager = (ViewPager) findViewById(R.id.view_pager);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         list = DataSupport.findAll(SavedWeather.class);
-        weatherViewPager.setOffscreenPageLimit(list.size());
+//        weatherViewPager.setOffscreenPageLimit(list.size());
         navigationView = (NavigationView) findViewById(R.id.nav_view);
         bingPicImg = (ImageView) findViewById(R.id.bing_pic_img);
         navigationView.setCheckedItem(R.id.control_county);
@@ -66,7 +67,7 @@ public class WeatherActivity extends AppCompatActivity {
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.control_county:
-                        startActivity(new Intent(WeatherActivity.this, EditCountyActivity.class));
+                        startActivityForResult(new Intent(WeatherActivity.this, EditCountyActivity.class), 2);
                         drawerLayout.closeDrawers();
                         break;
                 }
@@ -87,12 +88,12 @@ public class WeatherActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Toast.makeText(this,"1",Toast.LENGTH_SHORT).show();
-        if (resultCode == RESULT_OK) {
+        if (requestCode == 1 && resultCode == RESULT_OK) {
             adapter.notifyDataSetChanged();
-            list = DataSupport.findAll(SavedWeather.class);
-            weatherViewPager.setOffscreenPageLimit(list.size());
-
+            weatherViewPager.setCurrentItem(list.size());
+        }
+        if (requestCode == 2 && resultCode == RESULT_OK) {
+            adapter.notifyDataSetChanged();
         }
     }
 
@@ -105,8 +106,16 @@ public class WeatherActivity extends AppCompatActivity {
         }
 
         @Override
+        public int getItemPosition(Object object) {
+            return PagerAdapter.POSITION_NONE;
+        }
+
+        @Override
         public void notifyDataSetChanged() {
             list = DataSupport.findAll(SavedWeather.class);
+            if (list.isEmpty()) {
+                startActivityForResult(new Intent(WeatherActivity.this, AddCountyActivity.class), 1);
+            }
             super.notifyDataSetChanged();
         }
 
@@ -120,6 +129,8 @@ public class WeatherActivity extends AppCompatActivity {
             return list.size();
         }
     }
+
+
 
     /**
      * 加载bing每日一图

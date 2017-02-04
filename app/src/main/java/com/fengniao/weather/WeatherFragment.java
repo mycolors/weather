@@ -36,7 +36,6 @@ import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
 
-import static android.app.Activity.RESULT_OK;
 
 
 /**
@@ -81,11 +80,9 @@ public class WeatherFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         //初始化各种控件
-        Log.i("mycolors", "onAcitvityCreate");
         initView();
         String weatherId = getArguments().getString("weatherId");
         String weatherString = DataSupport.where("weatherId = ?", weatherId).find(SavedWeather.class).get(0).getWeatherData();
-        Log.i("mycolors", weatherString);
         if (weatherString != null) {
             //有缓存时直接解析天气数据
             Weather weather = Utility.handleWeatherResponse(weatherString);
@@ -99,7 +96,6 @@ public class WeatherFragment extends Fragment {
         swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                Log.i("mycolors", "onRefresh");
                 requestWeather(finalWeatherId);
             }
         });
@@ -112,27 +108,27 @@ public class WeatherFragment extends Fragment {
         addBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivityForResult(new Intent(getContext(), AddCountyActivity.class), 1);
+               getActivity().startActivityForResult(new Intent(getContext(), AddCountyActivity.class), 1);
             }
         });
     }
 
     public void initView() {
-        weatherLayout = (ScrollView) getActivity().findViewById(R.id.weather_layout);
-        titleCity = (TextView) getActivity().findViewById(R.id.title_city);
-        titleUpdatetTime = (TextView) getActivity().findViewById(R.id.title_update_time);
-        degreeText = (TextView) getActivity().findViewById(R.id.degree_text);
-        weatherInfoText = (TextView) getActivity().findViewById(R.id.weather_info_text);
-        forecastLayout = (LinearLayout) getActivity().findViewById(R.id.forecast_layout);
-        aqiText = (TextView) getActivity().findViewById(R.id.aqi_text);
-        pm25Text = (TextView) getActivity().findViewById(R.id.pm25_text);
-        comfortText = (TextView) getActivity().findViewById(R.id.comfort_text);
-        carWashText = (TextView) getActivity().findViewById(R.id.car_wash_text);
-        sportText = (TextView) getActivity().findViewById(R.id.sport_text);
-        swipeRefresh = (SwipeRefreshLayout) getActivity().findViewById(R.id.swipe_refresh);
+        weatherLayout = (ScrollView) getView().findViewById(R.id.weather_layout);
+        titleCity = (TextView) getView().findViewById(R.id.title_city);
+        titleUpdatetTime = (TextView) getView().findViewById(R.id.title_update_time);
+        degreeText = (TextView) getView().findViewById(R.id.degree_text);
+        weatherInfoText = (TextView) getView().findViewById(R.id.weather_info_text);
+        forecastLayout = (LinearLayout) getView().findViewById(R.id.forecast_layout);
+        aqiText = (TextView) getView().findViewById(R.id.aqi_text);
+        pm25Text = (TextView) getView().findViewById(R.id.pm25_text);
+        comfortText = (TextView) getView().findViewById(R.id.comfort_text);
+        carWashText = (TextView) getView().findViewById(R.id.car_wash_text);
+        sportText = (TextView) getView().findViewById(R.id.sport_text);
+        swipeRefresh = (SwipeRefreshLayout) getView().findViewById(R.id.swipe_refresh);
         swipeRefresh.setColorSchemeResources(R.color.colorPrimary);
-        navBtn = (Button) getActivity().findViewById(R.id.nav_button);
-        addBtn = (FloatingActionButton) getActivity().findViewById(R.id.btn_add);
+        navBtn = (Button) getView().findViewById(R.id.nav_button);
+        addBtn = (FloatingActionButton) getView().findViewById(R.id.btn_add);
     }
 
     /**
@@ -141,14 +137,12 @@ public class WeatherFragment extends Fragment {
      * @param weatherId
      */
     public void requestWeather(final String weatherId) {
-        Log.i("mycolors", "requestWeather");
         String weatherUrl = "http://guolin.tech/api/weather?cityid="
                 + weatherId + "&key=bc0418b57b2d4918819d3974ac1285d9";
         HttpUtil.sendOkHttpRequest(weatherUrl, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 e.printStackTrace();
-                Log.i("mycolors", "onFailure");
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -161,7 +155,6 @@ public class WeatherFragment extends Fragment {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 final String responseText = response.body().string();
-                Log.i("mycolors", "onResponse");
                 final Weather weather = Utility.handleWeatherResponse(responseText);
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
@@ -189,7 +182,6 @@ public class WeatherFragment extends Fragment {
      * @param weather
      */
     private void showWeatherInfo(Weather weather) {
-        Log.i("mycolors", "showWeatherInfo");
         Intent intent = new Intent(getContext(), AutoUpdateService.class);
         getActivity().startService(intent);
         String cityName = weather.basic.cityName;

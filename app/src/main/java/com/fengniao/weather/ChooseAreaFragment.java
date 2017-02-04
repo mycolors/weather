@@ -112,8 +112,10 @@ public class ChooseAreaFragment extends Fragment {
                     queryCounties();
                 } else if (currentLevel == LEVEL_COUNTY) {
                     String weatherId = countyList.get(position).getWeatherId();
+                    String countyName = countyList.get(position).getCountyName();
                     SavedWeather savedWeather = new SavedWeather();
                     savedWeather.setWeatherId(weatherId);
+                    savedWeather.setCountyName(countyName);
                     List<SavedWeather> list = DataSupport.where("weatherId=?", weatherId).find(SavedWeather.class);
                     if (list == null || list.isEmpty()) {
                         savedWeather.save();
